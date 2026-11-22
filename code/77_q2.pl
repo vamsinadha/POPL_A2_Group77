@@ -81,3 +81,18 @@ tree_string(op(Op, Left, Right), String) :-
 % Wrapped is the string Text with ( in front and ) after it.
 wrap_parens(Text, Wrapped) :-
     format(string(Wrapped), "(~w)", [Text]).
+
+% generate_equation(+List, -Equation)
+% Equation is a string "L=R" with no spaces, where L is an expression over
+% a non-empty front part of List, R is an expression over the rest, and
+% both sides have the same integer value. On backtracking it gives every
+% valid equation. Fails if there is none, including for lists of length
+% 0 or 1 (split_list/3 has no split for them).
+generate_equation(List, Equation) :-
+    split_list(List, LeftNums, RightNums),
+    expr(LeftNums, LeftTree, LeftValue),
+    expr(RightNums, RightTree, RightValue),
+    LeftValue =:= RightValue,
+    tree_string(LeftTree, LeftText),
+    tree_string(RightTree, RightText),
+    format(string(Equation), "~w=~w", [LeftText, RightText]).
