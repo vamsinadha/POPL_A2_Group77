@@ -87,3 +87,41 @@
   (print-line (inorder tree))
   (print-line (preorder tree))
   (print-line (postorder tree)))
+
+;; ---------------------------------------------------------------------------
+;; Height and leaves
+
+;; (leaf? tree) -> boolean
+;; A non-empty tree is a leaf when both its subtrees are ().
+(define (leaf? tree)
+  (and (null? (node-left tree))
+       (null? (node-right tree))))
+
+;; (height tree) -> number
+;; The height of () is 0; the height of (v l r) is 1 + the larger of the
+;; heights of l and r.
+(define (height tree)
+  (if (null? tree)
+      0
+      (+ 1 (max (height (node-left tree))
+                (height (node-right tree))))))
+
+;; (count-leaves-acc tree acc) -> number
+;; For () the result is acc. For a leaf it is acc + 1. For any other node it
+;; is acc plus the leaves of the left subtree plus the leaves of the right
+;; subtree (the count is carried through acc; the right subtree is a tail call).
+(define (count-leaves-acc tree acc)
+  (cond ((null? tree) acc)
+        ((leaf? tree) (+ acc 1))
+        (else (count-leaves-acc (node-right tree)
+                                (count-leaves-acc (node-left tree) acc)))))
+
+;; (count-leaves tree) -> number
+;; The number of leaves in tree; the empty tree has none.
+(define (count-leaves tree)
+  (count-leaves-acc tree 0))
+
+;; (print-height-and-leaves tree)
+;; Prints one line: the list (height leaf-count) of tree, e.g. (3 4).
+(define (print-height-and-leaves tree)
+  (print-line (list (height tree) (count-leaves tree))))
