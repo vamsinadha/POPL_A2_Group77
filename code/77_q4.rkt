@@ -33,3 +33,24 @@
     (if (null? rest)
         (my-reverse acc)
         (loop (cdr rest) (cons (f (car rest)) acc)))))
+
+;; (is-list? e) -> boolean
+;; e is a list: either () or a pair. (Elements are atoms or proper lists,
+;; there are no dotted pairs.)
+(define (is-list? e)
+  (or (null? e) (pair? e)))
+
+;; (insert-if-short x lst n) -> list
+;; lst with x inserted at the front of every list (lst itself included,
+;; at every level of nesting) whose original length is less than n.
+;; Every element that is a list is first processed the same way (my-map);
+;; then x is consed in front if the length of the original lst is < n.
+(define (insert-if-short x lst n)
+  (let ((processed (my-map (lambda (e)
+                             (if (is-list? e)
+                                 (insert-if-short x e n)
+                                 e))
+                           lst)))
+    (if (< (my-length lst) n)
+        (cons x processed)
+        processed)))
