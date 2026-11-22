@@ -50,7 +50,7 @@ If one of these is needed, write it yourself with the `my-` prefix (`my-length`,
   ```
 - Pass all state through arguments (accumulators); no global mutable state.
 - Prefer tail recursion (named `let` with an accumulator) where it is natural, especially for walking long lists (S2 hidden tests use lists of 10,000 elements and nesting depth 100).
-- Build lists in the right order instead of building them backwards and reversing; when walking a tree, pass the accumulator from the right so `cons` produces the final order.
+- When walking a tree, pass the accumulator from the right so `cons` produces the final order directly (no reversing needed). For a long flat list (like S2's 10,000 elements), collecting results backwards in a tail-recursive loop and turning them around once with your own `my-reverse` at the end is the accepted pattern; what to avoid is reversing repeatedly or using `append` to add at the end.
 - Small helpers with clear readings are better than one long function. Two-space indentation, standard Racket layout, closing parentheses on the same line.
 
 ## How to run code
@@ -111,7 +111,8 @@ raco test tests/test_q4.rkt
 3. Only the built-ins in the table above. Anything else is written by hand.
 4. Every printing function prints exactly what is specified with `display` and ends with exactly one `newline`.
 5. S1: trees are `()` or `(value left right)`; visit left before right; height of `()` is 0; a leaf is a node with two empty subtrees.
-6. S2: lengths are measured on the **original** list, before insertion; the top-level list is treated like any other list; `()` has length 0; the final file has exactly one `insert-if-short`, defined with `make-inserter`.
+6. S2: lengths are measured on the **original** list, before insertion; the top-level list is treated like any other list; `()` has length 0; the final file has exactly one `insert-if-short`, defined with `make-inserter`. `make-inserter` itself must still use `my-length` and `my-map` (S2.b requires them), so moving to `make-inserter` must not drop those helpers.
+7. S2 `print-insert-result` takes no arguments, calls `read` three times in the order `x`, `lst`, `n` (the values `read` returns are already data, so never quote them), and prints only the resulting list with `display` followed by one `newline`: no prompt and no other text.
 
 ## Self-review checklist (apply before every answer)
 
@@ -137,5 +138,5 @@ raco test tests/test_q4.rkt
 - **Treating `()` as special or as an atom wrongly:** in Racket `(pair? '())` is `#f` and `(null? '())` is `#t`; a sublist is detected with `pair?` or `null?`, not `list?`.
 - **Measuring length after inserting** (S2), or skipping the top-level list.
 - **Deep non-tail recursion over long lists:** recursing on `cdr` without an accumulator for 10,000 elements; keep the deep recursion only where the problem forces it (nesting, tree height).
-- **Using `else` in `if`** or forgetting `else` in `cond`, giving `#<void>` results that `display` prints.
+- **`if` and `cond` mix-ups:** `if` has no `else` keyword (it is always `(if test then-part else-part)`), and a `cond` without an `else` clause returns `#<void>` when no test matches, which `display` then prints.
 - **Confusing `eq?` with `equal?`:** `eq?` is fine for symbols and small numbers, not for comparing lists.
