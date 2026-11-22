@@ -75,3 +75,19 @@ clue(8, Solution) :-
     member(p(_, Dept, Lang, data), Solution),
     Dept == research,
     Lang \== javascript.
+
+% satisfies_all(+Active, +Solution)
+% Every clue whose number is in the list Active holds in Solution.
+satisfies_all(Active, Solution) :-
+    forall(member(N, Active), clue(N, Solution)).
+
+% main
+% Prints one solution that satisfies clues 1 to 8, one line per friend in
+% the order Alex, Ben, Carla, Dana, as  Name = [Dept, Lang, Project].
+% The solution is found by generate-and-test, not hard-coded; once/1 keeps
+% only the first one.
+main :-
+    once(( candidate(Solution),
+           satisfies_all([1,2,3,4,5,6,7,8], Solution) )),
+    forall(member(p(Name, Dept, Lang, Project), Solution),
+           format("~w = [~w, ~w, ~w]~n", [Name, Dept, Lang, Project])).
