@@ -6,6 +6,7 @@
 % project value is used exactly once.
 
 :- use_module(library(lists)).
+:- use_module(library(aggregate)).
 
 % candidate(-Solution)
 % Solution is a fully filled-in assignment for Alex, Ben, Carla and Dana
@@ -91,3 +92,13 @@ main :-
            satisfies_all([1,2,3,4,5,6,7,8], Solution) )),
     forall(member(p(Name, Dept, Lang, Project), Solution),
            format("~w = [~w, ~w, ~w]~n", [Name, Dept, Lang, Project])).
+
+% count_solutions(+Active, -N)
+% N is the number of candidates that satisfy every clue whose number is in
+% Active; clues not in Active are ignored. With Active = [] every one of
+% the 13824 candidates counts.
+count_solutions(Active, N) :-
+    aggregate_all(count,
+                  ( candidate(Solution),
+                    satisfies_all(Active, Solution) ),
+                  N).
