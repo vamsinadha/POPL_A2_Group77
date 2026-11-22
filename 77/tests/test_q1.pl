@@ -1,5 +1,5 @@
 % Tests for P1 (code/77_q1.pl)
-% Run from the repository root:
+% Run from the 77/ folder:
 %   swipl -q -f tests/test_q1.pl -g run_tests -t halt
 
 :- use_module(library(plunit)).

@@ -1,6 +1,6 @@
 #lang racket/base
 ;; Tests for S2 (code/77_q4.rkt)
-;; Run from the repository root:
+;; Run from the 77/ folder:
 ;;   raco test tests/test_q4.rkt
 ;;
 ;; The solution file has no provide, so the tests reach its definitions

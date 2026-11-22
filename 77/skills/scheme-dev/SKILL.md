@@ -55,7 +55,7 @@ If one of these is needed, write it yourself with the `my-` prefix (`my-length`,
 
 ## How to run code
 
-From the repository root:
+From the 77/ folder:
 
 ```
 racket code/77_q3.rkt

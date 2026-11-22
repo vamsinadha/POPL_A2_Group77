@@ -37,7 +37,7 @@ Instructions for an AI assistant writing or reviewing Prolog for CS F301 Assignm
 
 ## How to run code
 
-Run from the repository root:
+Run from the 77/ folder:
 
 ```
 swipl -q -f code/77_q1.pl -g main -t halt
