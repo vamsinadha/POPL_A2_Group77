@@ -39,3 +39,45 @@ apply_op(/, X, Y, Value) :-
     Y =\= 0,
     X mod Y =:= 0,
     Value is X // Y.
+
+% op_prec(?Op, ?Prec)
+% Prec is the precedence of operator Op: * and / bind tighter than + and -.
+op_prec(+, 1).
+op_prec(-, 1).
+op_prec(*, 2).
+op_prec(/, 2).
+
+% tree_prec(+Tree, -Prec)
+% Prec is the precedence of the top of Tree. A number gets 3, higher than
+% any operator, so it is never put in parentheses.
+tree_prec(num(_), 3).
+tree_prec(op(Op, _, _), Prec) :-
+    op_prec(Op, Prec).
+
+% tree_string(+Tree, -String)
+% String is the canonical text of Tree with no spaces. A left operand is
+% wrapped in parentheses only if its precedence is lower than its
+% parent's; a right operand is wrapped if its precedence is the same or
+% lower (operators are left-associative). Numbers are never wrapped.
+tree_string(num(N), String) :-
+    number_string(N, String).
+tree_string(op(Op, Left, Right), String) :-
+    op_prec(Op, Prec),
+    tree_string(Left, LeftText),
+    tree_string(Right, RightText),
+    tree_prec(Left, LeftPrec),
+    tree_prec(Right, RightPrec),
+    (   LeftPrec < Prec
+    ->  wrap_parens(LeftText, LeftOut)
+    ;   LeftOut = LeftText
+    ),
+    (   RightPrec =< Prec
+    ->  wrap_parens(RightText, RightOut)
+    ;   RightOut = RightText
+    ),
+    format(string(String), "~w~w~w", [LeftOut, Op, RightOut]).
+
+% wrap_parens(+Text, -Wrapped)
+% Wrapped is the string Text with ( in front and ) after it.
+wrap_parens(Text, Wrapped) :-
+    format(string(Wrapped), "(~w)", [Text]).
