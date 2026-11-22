@@ -40,20 +40,32 @@
 (define (is-list? e)
   (or (null? e) (pair? e)))
 
+;; (make-inserter x len-ok?) -> function
+;; Returns a function insert of one argument, a list lst. (insert lst) is
+;; lst with x inserted at the front of every list (lst itself included, at
+;; every level of nesting) whose original length satisfies len-ok?.
+;; Every element of lst that is a list is first processed by insert itself
+;; (my-map); then x is consed in front if (len-ok? (my-length lst)) holds.
+;; The length is taken on the original lst, before anything is inserted.
+(define (make-inserter x len-ok?)
+  (letrec ((insert
+            (lambda (lst)
+              (let ((processed (my-map (lambda (e)
+                                         (if (is-list? e)
+                                             (insert e)
+                                             e))
+                                       lst)))
+                (if (len-ok? (my-length lst))
+                    (cons x processed)
+                    processed)))))
+    insert))
+
 ;; (insert-if-short x lst n) -> list
-;; lst with x inserted at the front of every list (lst itself included,
-;; at every level of nesting) whose original length is less than n.
-;; Every element that is a list is first processed the same way (my-map);
-;; then x is consed in front if the length of the original lst is < n.
+;; lst with x inserted at the front of every list (lst itself included, at
+;; every level of nesting) whose original length is less than n: the
+;; inserter made by make-inserter with the test "length < n", applied to lst.
 (define (insert-if-short x lst n)
-  (let ((processed (my-map (lambda (e)
-                             (if (is-list? e)
-                                 (insert-if-short x e n)
-                                 e))
-                           lst)))
-    (if (< (my-length lst) n)
-        (cons x processed)
-        processed)))
+  ((make-inserter x (lambda (len) (< len n))) lst))
 
 ;; (print-insert-result)
 ;; Reads x, lst and n from standard input (in that order, with read) and
