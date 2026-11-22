@@ -96,3 +96,17 @@ generate_equation(List, Equation) :-
     tree_string(LeftTree, LeftText),
     tree_string(RightTree, RightText),
     format(string(Equation), "~w=~w", [LeftText, RightText]).
+
+% all_equations(+List, -Equations)
+% Equations is the list of all valid equations for List, without
+% duplicates, in standard order of terms (sort/2). It is [] when no
+% equation exists.
+all_equations(List, Equations) :-
+    findall(Equation, generate_equation(List, Equation), Found),
+    sort(Found, Equations).
+
+% count_equations(+List, -N)
+% N is the number of distinct valid equations for List.
+count_equations(List, N) :-
+    all_equations(List, Equations),
+    length(Equations, N).
