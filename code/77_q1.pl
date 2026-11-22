@@ -77,6 +77,14 @@ clue(8, Solution) :-
     Dept == research,
     Lang \== javascript.
 
+% Clue 9 is added for P1.c. It holds only in the second solution of
+% clues 1-8 (the first and third use the same attribute combinations, so
+% no clue without names could keep either of them).
+% CLUE 9: The friend who prefers the AI project works in the testing department.
+clue(9, Solution) :-
+    member(p(_, Dept, _, 'AI'), Solution),
+    Dept == testing.
+
 % satisfies_all(+Active, +Solution)
 % Every clue whose number is in the list Active holds in Solution.
 satisfies_all(Active, Solution) :-
